@@ -1,3 +1,5 @@
+import re
+
 from fake_useragent import UserAgent
 
 
@@ -10,6 +12,3 @@ class Settings:
     HEADERS = {
         "user-agent": UserAgent().random
     }
-
-    # SITE SETTINGS
-    CARDS_PER_PAGE = 100
