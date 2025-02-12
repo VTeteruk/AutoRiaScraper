@@ -14,3 +14,6 @@ class Settings:
 
     # VALIDATOR SETTINGS
     BIDFAX_URL_IS_REQUIRED = False
+
+    # DB SETTINGS
+    DB_PATH = "cars.db"
