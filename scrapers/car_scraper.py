@@ -23,10 +23,11 @@ class CarScraper(CarDetailsScraper):
             soup = BeautifulSoup(text_response, "html.parser")
 
             property_data = self.get_car_data(soup)
-            return Car(
-                url=url,
-                **property_data
-            )
+            if property_data["pictures"] and property_data["name"] and property_data["price"]:
+                return Car(
+                    url=url,
+                    **property_data
+                )
         except Exception as ex:
             print(ex)  # TODO: add logger
 

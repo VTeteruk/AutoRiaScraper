@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 from core.schemas import Car
 from .car_scraper import CarScraper
-from .settings import Settings
+from settings import Settings
 
 
 class CarLinksScraper(CarScraper):
