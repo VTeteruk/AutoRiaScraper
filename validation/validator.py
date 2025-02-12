@@ -34,6 +34,9 @@ class Validator:
     def validate(self, car_data: list[Car]) -> list[Car]:
         for item in car_data:
 
+            if item.url in self.validated_data:
+                continue
+
             if not item.bidfax_url and Settings.BIDFAX_URL_IS_REQUIRED:
                 continue
 
