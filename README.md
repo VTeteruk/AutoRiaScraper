@@ -1,9 +1,9 @@
 # Auto-Ria Scraper
 ## Overview
-This Python script scrapes information about used cars from auto.ria.com, tracks price changes, and sends notifications about new listings, price updates, and unavailable cars via Telegram. It uses Selenium for web scraping, SQLite3 for data storage, and aiogram for Telegram notifications.
+This Python script scrapes information about used cars from auto.ria.com, tracks price changes, and sends notifications about new listings, price updates, and unavailable cars via Telegram. It uses aiohttp for web scraping, SQLite3 for data storage, and aiogram for Telegram notifications.
 ___
 ## Features
-* **Car Listings Scraper**: Collects information on used cars such as make, model, price, and photos from auto.ria.com. The script processes multiple pages to gather all available listings.
+* **Car Listings Scraper**: Collects information on used cars such as model, price, and photos from auto.ria.com. The script processes multiple pages to gather all available listings.
 
 * **Price Change Tracker:** The script compares new listings with previously stored data and tracks price changes.
 
