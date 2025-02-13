@@ -1,11 +1,7 @@
 import asyncio
 import json
-import logging
 import os
 import sqlite3
-import time
-
-from aiogram.exceptions import TelegramRetryAfter
 
 from core.config import configure_logging
 from core.schemas import Car
@@ -53,7 +49,7 @@ def check_price(cursor, url: str, name: str, price: str, bidfax_url: str, pictur
 
     if current_price[0] != price:
         cursor.execute("UPDATE cars SET price = ? WHERE url = ?", (price, url))
-        asyncio.run(send_telegram_notification(url, name, price, bidfax_url, pictures, changed_price=current_price[0]))
+        asyncio.run(send_telegram_notification(url, name, current_price[0], bidfax_url, pictures, changed_price=price))
 
 
 def save_data_to_db_send_notifications(conn: sqlite3.connect, data: list[Car]) -> None:
@@ -69,7 +65,6 @@ def save_data_to_db_send_notifications(conn: sqlite3.connect, data: list[Car]) -
             add_new_car(cursor, url, name, price, bidfax_url, pictures)
         else:
             check_price(cursor, url, name, price, bidfax_url, pictures)
-
 
     conn.commit()
     conn.close()
