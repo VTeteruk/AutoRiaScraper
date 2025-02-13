@@ -29,6 +29,7 @@ def main() -> None:
         logging.info("Saving data to DB & Sending notifications...")
         save_data_to_db_send_notifications(conn, validated_data)
 
+        logging.info("Waiting for the next start...")
         time.sleep(Settings.TIME_BETWEEN_RUNS)
 
 

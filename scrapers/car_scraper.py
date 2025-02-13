@@ -33,7 +33,7 @@ class CarScraper(CarDetailsScraper):
                     **property_data
                 )
         except Exception as ex:
-            logging.error(ex)
+            logging.error(f"{url}: {ex}")
 
     async def create_coroutines(self, session: aiohttp.ClientSession, links: list[str]) -> list[Car]:
         coroutines = [
