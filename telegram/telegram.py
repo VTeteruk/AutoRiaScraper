@@ -15,15 +15,15 @@ def get_caption(
         not_available: bool,
         changed_price: str
     ) -> str:
+    if not_available:
+        return f"<b>😔<a href='{url}'>{name}</a></b> is no longer available"
+
     if changed_price:
         message = f"<b>❗<a href='{url}'>{name}</a> new price</b>\n💰 <b><s>{price}</s> {changed_price}</b>\n"
     else:
         message = f"<b><a href='{url}'>{name}</a></b>\n💰 <b>{price}</b>\n"
     if bidfax_url:
         message += f"🇺🇸 <a href='{bidfax_url}'>bidfax</a>\n"
-
-    if not_available:
-        return f"<b>😔<a href='{url}'>{name}</a></b> is no longer available"
 
     return message
 
@@ -53,5 +53,6 @@ async def send_telegram_notification(
             time.sleep(Settings.TELEGRAM_NOTIFICATION_SLEEP_TIME)
 
         except Exception as ex:
+            print(ex)
             # TODO: add logging
             break

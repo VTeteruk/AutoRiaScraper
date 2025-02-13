@@ -52,19 +52,37 @@ def check_price(cursor, url: str, name: str, price: str, bidfax_url: str, pictur
         asyncio.run(send_telegram_notification(url, name, current_price[0], bidfax_url, pictures, changed_price=price))
 
 
+def check_unavailable_cars(cursor, data: list[Car]) -> None:
+    scraped_urls = [car.url for car in data]
+    cursor.execute("SELECT url FROM cars")
+    existing_cars = cursor.fetchall()
+
+    for existing_car in existing_cars:
+        existing_car = existing_car[0]
+        if existing_car not in scraped_urls:
+            cursor.execute("SELECT url, name, price, bidfax_url, pictures FROM cars WHERE url = ?", (existing_car,))
+            *car_data, pictures = cursor.fetchone()
+            asyncio.run(send_telegram_notification(*car_data, json.loads(pictures), not_available=True))
+
+            cursor.execute("DELETE FROM cars WHERE url = ?", (existing_car,))
+
+
 def save_data_to_db_send_notifications(conn: sqlite3.connect, data: list[Car]) -> None:
     cursor = conn.cursor()
 
-    for car in data:
-        cursor.execute("SELECT id FROM cars WHERE url = ?", (car.url,))
-        existing_car = cursor.fetchone()
+    try:
+        for car in data:
+            cursor.execute("SELECT id FROM cars WHERE url = ?", (car.url,))
+            existing_car = cursor.fetchone()
 
-        url, name, price, bidfax_url, pictures = car.url, car.name, car.price, car.bidfax_url, car.pictures
+            url, name, price, bidfax_url, pictures = car.url, car.name, car.price, car.bidfax_url, car.pictures
 
-        if not existing_car:
-            add_new_car(cursor, url, name, price, bidfax_url, pictures)
-        else:
-            check_price(cursor, url, name, price, bidfax_url, pictures)
+            if not existing_car:
+                add_new_car(cursor, url, name, price, bidfax_url, pictures)
+            else:
+                check_price(cursor, url, name, price, bidfax_url, pictures)
 
-    conn.commit()
-    conn.close()
+        check_unavailable_cars(cursor, data)
+    finally:
+        conn.commit()
+        conn.close()
