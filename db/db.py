@@ -1,8 +1,10 @@
+import asyncio
 import json
 import os
 import sqlite3
 
 from settings import Settings
+from telegram.telegram import send_telegram_notification
 
 
 def connect_db() -> sqlite3.connect:
@@ -27,7 +29,7 @@ def connect_db() -> sqlite3.connect:
     return sqlite3.connect(Settings.DB_PATH)
 
 
-def save_data_to_db(conn: sqlite3.connect, data: list) -> None:
+def save_data_to_db_send_notification(conn: sqlite3.connect, data: list) -> None:
     cursor = conn.cursor()
 
     for car in data:
@@ -35,10 +37,13 @@ def save_data_to_db(conn: sqlite3.connect, data: list) -> None:
         existing_car = cursor.fetchone()
 
         if not existing_car:
+            url, name, price, bidfax_url, pictures = car.url, car.name, car.price, car.bidfax_url, car.pictures
             cursor.execute(
                 "INSERT INTO cars (url, name, price, bidfax_url, pictures) VALUES (?, ?, ?, ?, ?)",
-                (car.url, car.name, car.price, car.bidfax_url, json.dumps(car.pictures))
+                (url, name, price, bidfax_url, json.dumps(pictures))
             )
+
+            asyncio.run(send_telegram_notification(url, name, price, bidfax_url, pictures))
 
     conn.commit()
     conn.close()

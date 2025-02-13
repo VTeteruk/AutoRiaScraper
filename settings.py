@@ -1,4 +1,10 @@
+import os
+
 from fake_useragent import UserAgent
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 
 class Settings:
@@ -17,3 +23,7 @@ class Settings:
 
     # DB SETTINGS
     DB_PATH = "cars.db"
+
+    # TELEGRAM BOT SETTINGS
+    TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+    TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
