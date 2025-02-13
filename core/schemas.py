@@ -5,6 +5,6 @@ from dataclasses import dataclass
 class Car:
     url: str
     name: str
-    price: int
+    price: str
     bidfax_url: str | None
-    pictures: list[str]
+    pictures: list

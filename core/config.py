@@ -6,6 +6,3 @@ def configure_logging() -> None:
         level=logging.INFO,
         format="%(levelname)s - %(message)s"
     )
-
-
-
