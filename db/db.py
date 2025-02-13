@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 import os
 import sqlite3
 
@@ -14,6 +15,7 @@ configure_logging()
 
 def connect_db() -> sqlite3.connect:
     if not os.path.exists(Settings.DB_PATH):
+        logging.info("Creating a DB...")
         conn = sqlite3.connect(Settings.DB_PATH)
         cursor = conn.cursor()
 
@@ -39,6 +41,8 @@ def add_new_car(cursor, url: str, name: str, price: str, bidfax_url: str, pictur
         "INSERT INTO cars (url, name, price, bidfax_url, pictures) VALUES (?, ?, ?, ?, ?)",
         (url, name, price, bidfax_url, json.dumps(pictures))
     )
+
+    logging.info(f"New car: {url}")
 
     asyncio.run(send_telegram_notification(url, name, price, bidfax_url, pictures))
 
@@ -82,6 +86,7 @@ def save_data_to_db_send_notifications(conn: sqlite3.connect, data: list[Car]) -
             else:
                 check_price(cursor, url, name, price, bidfax_url, pictures)
 
+        logging.info("Checking unavailable cars...")
         check_unavailable_cars(cursor, data)
     finally:
         conn.commit()

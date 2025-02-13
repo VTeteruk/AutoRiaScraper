@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import math
 import re
 
@@ -36,6 +37,7 @@ class CarLinksScraper(CarScraper):
             # Getting total count of listings
             scripts = " ".join(str(script) for script in soup.find_all("script"))
             total_count = int(re.findall(r"resultsCount\s*=\s*Number\(([0-9]+)\)", scripts)[0])
+            logging.info(f"{total_count} cars were found")
             return math.ceil(total_count / self.get_cards_per_page())
         except (IndexError, ValueError, TypeError):
             # In case page has no pagination
@@ -43,15 +45,15 @@ class CarLinksScraper(CarScraper):
 
     async def process_links_async(self) -> list[Car]:
         async with aiohttp.ClientSession(headers=Settings.HEADERS) as session:
-            # TODO: add logging
             max_page_number = await self.get_max_page_number_async(session, f"{Settings.BASE_SEARCH_URL}{0}")
             for page_index in range(max_page_number):
                 links = await self.get_cars_links(session, f"{Settings.BASE_SEARCH_URL}{page_index}")
 
                 try:
                     self.cars += await self.create_coroutines(session, links)
+                    logging.info(f"Parsed pages: {page_index + 1} / {max_page_number}")
                 except Exception as ex:
-                    print(ex)  # TODO: add logger
+                    logging.error(ex)
         return self.cars
 
     def scrape_cars(self) -> list[Car]:

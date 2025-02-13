@@ -1,10 +1,14 @@
+import logging
 import time
 
 from aiogram import Bot
 from aiogram.exceptions import TelegramRetryAfter
 from aiogram.types import InputMediaPhoto
 
+from core.config import configure_logging
 from settings import Settings
+
+configure_logging()
 
 
 def get_caption(
@@ -14,7 +18,7 @@ def get_caption(
         bidfax_url: str,
         not_available: bool,
         changed_price: str
-    ) -> str:
+) -> str:
     if not_available:
         return f"<b>😔<a href='{url}'>{name}</a></b> is no longer available"
 
@@ -50,9 +54,9 @@ async def send_telegram_notification(
             break
 
         except TelegramRetryAfter:
+            logging.info("Sleeping to send messages...")
             time.sleep(Settings.TELEGRAM_NOTIFICATION_SLEEP_TIME)
 
         except Exception as ex:
-            print(ex)
-            # TODO: add logging
+            logging.error(ex)
             break

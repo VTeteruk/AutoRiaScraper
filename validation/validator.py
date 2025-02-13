@@ -1,9 +1,13 @@
+import logging
 from dataclasses import fields
 
 from price_parser import Price
 
+from core.config import configure_logging
 from core.schemas import Car
 from settings import Settings
+
+configure_logging()
 
 
 class Validator:
@@ -27,7 +31,8 @@ class Validator:
                 return False
         return True
 
-    def prettify_price(self, price: str) -> str:
+    @staticmethod
+    def prettify_price(price: str) -> str:
         parsed_price = Price.fromstring(price)
         return f"{parsed_price.amount} {parsed_price.currency}"
 
@@ -49,7 +54,7 @@ class Validator:
                 self.validated_data.append(item)
 
             except Exception as ex:
-                print(ex)  # TODO: add logger
+                logging.error(ex)
                 continue
 
         return self.validated_data
