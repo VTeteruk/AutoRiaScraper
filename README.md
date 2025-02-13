@@ -49,6 +49,17 @@ ___
 You can customize the script behavior by modifying the settings in the `settings.py` file.
 
 
-**NOTE:**
+## Note
 
 As this project uses asynchronous scraping, there may be instances where adding a proxy is necessary to bypass bot detection mechanisms.
+
+## Project Images
+
+### New listing
+![new_listing.png](README_images%2Fnew_listing.png)
+
+### New Price
+![new_price.png](README_images%2Fnew_price.png)
+
+### Not Available
+![not_available.png](README_images%2Fnot_available.png)
