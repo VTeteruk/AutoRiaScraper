@@ -2,7 +2,7 @@ import logging
 
 from core.config import configure_logging
 from core.schemas import Car
-from db.db import connect_db, save_data_to_db_send_notification
+from db.db import connect_db, save_data_to_db_send_notifications
 from scrapers.car_links_scraper import CarLinksScraper
 from validation.validator import Validator
 
@@ -24,7 +24,7 @@ def main() -> None:
     conn = connect_db()
 
     logging.info("Saving data to DB & Sending notifications...")
-    save_data_to_db_send_notification(conn, validated_data)
+    save_data_to_db_send_notifications(conn, validated_data)
 
 
 if __name__ == "__main__":

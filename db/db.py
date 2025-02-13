@@ -1,13 +1,19 @@
 import asyncio
 import json
+import logging
 import os
 import sqlite3
 import time
 
 from aiogram.exceptions import TelegramRetryAfter
 
+from core.config import configure_logging
+from core.schemas import Car
 from settings import Settings
 from telegram.telegram import send_telegram_notification
+
+
+configure_logging()
 
 
 def connect_db() -> sqlite3.connect:
@@ -32,29 +38,38 @@ def connect_db() -> sqlite3.connect:
     return sqlite3.connect(Settings.DB_PATH)
 
 
-def save_data_to_db_send_notification(conn: sqlite3.connect, data: list) -> None:
+def add_new_car(cursor, url: str, name: str, price: str, bidfax_url: str, pictures: list) -> None:
+    cursor.execute(
+        "INSERT INTO cars (url, name, price, bidfax_url, pictures) VALUES (?, ?, ?, ?, ?)",
+        (url, name, price, bidfax_url, json.dumps(pictures))
+    )
+
+    asyncio.run(send_telegram_notification(url, name, price, bidfax_url, pictures))
+
+
+def check_price(cursor, url: str, name: str, price: str, bidfax_url: str, pictures: list) -> None:
+    cursor.execute("SELECT price FROM cars WHERE url = ?", (url,))
+    current_price = cursor.fetchone()
+
+    if current_price[0] != price:
+        cursor.execute("UPDATE cars SET price = ? WHERE url = ?", (price, url))
+        asyncio.run(send_telegram_notification(url, name, price, bidfax_url, pictures, changed_price=current_price[0]))
+
+
+def save_data_to_db_send_notifications(conn: sqlite3.connect, data: list[Car]) -> None:
     cursor = conn.cursor()
 
     for car in data:
         cursor.execute("SELECT id FROM cars WHERE url = ?", (car.url,))
         existing_car = cursor.fetchone()
 
-        if not existing_car:
-            url, name, price, bidfax_url, pictures = car.url, car.name, car.price, car.bidfax_url, car.pictures
-            cursor.execute(
-                "INSERT INTO cars (url, name, price, bidfax_url, pictures) VALUES (?, ?, ?, ?, ?)",
-                (url, name, price, bidfax_url, json.dumps(pictures))
-            )
+        url, name, price, bidfax_url, pictures = car.url, car.name, car.price, car.bidfax_url, car.pictures
 
-            for _ in range(Settings.TELEGRAM_NOTIFICATION_RETRIES):
-                try:
-                    asyncio.run(send_telegram_notification(url, name, price, bidfax_url, pictures))
-                    break
-                except TelegramRetryAfter:
-                    time.sleep(Settings.TELEGRAM_NOTIFICATION_SLEEP_TIME)
-                except Exception as ex:
-                    # TODO: add logging
-                    break
+        if not existing_car:
+            add_new_car(cursor, url, name, price, bidfax_url, pictures)
+        else:
+            check_price(cursor, url, name, price, bidfax_url, pictures)
+
 
     conn.commit()
     conn.close()
