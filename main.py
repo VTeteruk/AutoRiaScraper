@@ -17,23 +17,8 @@ def scrape_data() -> list[Car]:
 
 
 def main() -> None:
-    # logging.info("Scrape Cars...")
-    # validated_data = scrape_data()
-
-    validated_data = [
-        Car(
-            "https://auto.ria.com/auto_toyota_sequoia_37706752.html",
-            "Toyota Sequoia 2008",
-            "100 $",
-            "http://google.com/",
-            [
-                "https://cdn0.riastatic.com/photosnew/auto/photo/toyota_sequoia__582365205fx.webp",
-                "https://cdn3.riastatic.com/photosnew/auto/photo/toyota_sequoia__582365183fx.webp",
-                "https://cdn0.riastatic.com/photosnew/auto/photo/toyota_sequoia__582365205fx.webp",
-                "https://cdn3.riastatic.com/photosnew/auto/photo/toyota_sequoia__582365183fx.webp",
-            ]
-        )
-    ]
+    logging.info("Scrape Cars...")
+    validated_data = scrape_data()
 
     logging.info("Connecting to DB...")
     conn = connect_db()

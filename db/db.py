@@ -2,6 +2,9 @@ import asyncio
 import json
 import os
 import sqlite3
+import time
+
+from aiogram.exceptions import TelegramRetryAfter
 
 from settings import Settings
 from telegram.telegram import send_telegram_notification
@@ -43,7 +46,15 @@ def save_data_to_db_send_notification(conn: sqlite3.connect, data: list) -> None
                 (url, name, price, bidfax_url, json.dumps(pictures))
             )
 
-            asyncio.run(send_telegram_notification(url, name, price, bidfax_url, pictures))
+            for _ in range(Settings.TELEGRAM_NOTIFICATION_RETRIES):
+                try:
+                    asyncio.run(send_telegram_notification(url, name, price, bidfax_url, pictures))
+                    break
+                except TelegramRetryAfter:
+                    time.sleep(Settings.TELEGRAM_NOTIFICATION_SLEEP_TIME)
+                except Exception as ex:
+                    # TODO: add logging
+                    break
 
     conn.commit()
     conn.close()
