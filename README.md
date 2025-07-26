@@ -58,8 +58,5 @@ As this project uses asynchronous scraping, there may be instances where adding 
 ### New listing
 ![new_listing.png](README_images%2Fnew_listing.png)
 
-### New Price
-![new_price.png](README_images%2Fnew_price.png)
-
 ### Not Available
 ![not_available.png](README_images%2Fnot_available.png)
